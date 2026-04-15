@@ -1,0 +1,8 @@
+backend/uploads/
+.git
+.gitignore
+.env
+google-cloud-sdk/
+frontend/node_modules/
+backend/__pycache__/
+*.pyc
