@@ -18,7 +18,14 @@ import google.generativeai as genai
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app)  # Allow all origins for development
+CORS(app, origins=[
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'http://localhost:3000',
+  'https://fairlens-one.vercel.app',
+  'https://fairlens-1rfu.onrender.com',
+  '*'
+])
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -272,7 +279,7 @@ Rules:
 print(f"Gemini Status: " + ("✅ Connected" if gemini_model else "⚠️ Not configured"))
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5001))
+    port = int(os.environ.get('PORT', 5000))
     print(f"🔍 FairLens API starting on http://localhost:{port}")
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)
 
