@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About FairLens — AI Bias Detection Platform</title>
+  <meta name="description" content="Learn about FairLens — the AI bias detection startup making machine learning fair for everyone."/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="url(#g1)" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <ellipse cx="20" cy="20" rx="10" ry="6" stroke="url(#g1)" stroke-width="1.5"/>
+        <circle cx="20" cy="20" r="3.5" fill="url(#g1)"/>
+        <line x1="2" y1="20" x2="10" y2="20" stroke="url(#g2)" stroke-width="1.5"/>
+        <line x1="30" y1="20" x2="38" y2="20" stroke="url(#g2)" stroke-width="1.5"/>
+        <line x1="20" y1="2" x2="20" y2="14" stroke="url(#g2)" stroke-width="1.5"/>
+        <line x1="20" y1="26" x2="20" y2="38" stroke="url(#g2)" stroke-width="1.5"/>
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#7C3AED"/><stop offset="1" stop-color="#06B6D4"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#06B6D4"/><stop offset="1" stop-color="#EC4899"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span>FairLens</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="scan.html">Scan</a></li>
+    <li><a href="reports.html">Reports</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a href="scan.html" class="btn btn-glow" style="padding:0.6rem 1.2rem;font-size:0.85rem;">Try Free Scan</a>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-header" style="padding-top:9rem;padding-bottom:4rem;">
+  <div class="section-tag">About</div>
+  <h1>Building the Future of <span class="gradient-text">Fair AI</span></h1>
+  <p style="max-width:600px;" class="text-muted">
+    FairLens was built because we believe every person deserves to be treated fairly — by human or machine.
+  </p>
+</div>
+
+<!-- MISSION -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="purple-card reveal" style="max-width:800px;margin:0 auto;text-align:center;padding:3rem 2rem;">
+      <div style="font-size:3rem;margin-bottom:1rem;">🎯</div>
+      <h2 style="font-size:2rem;font-weight:900;letter-spacing:-1px;margin-bottom:1rem;">
+        Our Mission
+      </h2>
+      <p style="font-size:1.1rem;color:var(--text-muted);line-height:1.8;max-width:600px;margin:0 auto;">
+        We make AI bias detection <strong style="color:var(--cyan)">accessible, immediate, and actionable</strong>.
+        Every AI system in the world should be audited for fairness. We make that happen in 30 seconds.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- THE PROBLEM -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">The Problem</div>
+      <h2 class="section-title">AI Bias is <span class="gradient-text-pink">Everywhere</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;">
+      <div class="glass-card reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">🚨</div>
+        <h3 style="font-size:1.1rem;font-weight:700;color:var(--red);margin-bottom:0.5rem;">Amazon's Hiring AI</h3>
+        <p class="text-muted text-sm">Amazon scrapped its AI hiring tool after it was found to penalize resumes that included the word "women's" — systematically discriminating against female candidates.</p>
+      </div>
+      <div class="glass-card reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">👁️</div>
+        <h3 style="font-size:1.1rem;font-weight:700;color:var(--yellow);margin-bottom:0.5rem;">Facial Recognition Disaster</h3>
+        <p class="text-muted text-sm">MIT study showed commercial facial recognition systems had 34% higher error rates for darker-skinned women compared to light-skinned men.</p>
+      </div>
+      <div class="glass-card reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">🏦</div>
+        <h3 style="font-size:1.1rem;font-weight:700;color:var(--red);margin-bottom:0.5rem;">Credit Scoring</h3>
+        <p class="text-muted text-sm">The US CFPB found mortgage AIs systematically denied loans to Black applicants at 3× the rate of equally-qualified white applicants.</p>
+      </div>
+      <div class="glass-card reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">🏥</div>
+        <h3 style="font-size:1.1rem;font-weight:700;color:var(--yellow);margin-bottom:0.5rem;">Healthcare AI</h3>
+        <p class="text-muted text-sm">A widely-used healthcare AI was proven to recommend fewer resources for Black patients with the same illness severity as white patients.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUR APPROACH -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Methodology</div>
+      <h2 class="section-title">How FairLens <span class="gradient-text">Detects Bias</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;">
+
+      <div class="reveal">
+        <div class="purple-card" style="height:100%;">
+          <h3 style="font-size:1rem;font-weight:700;color:var(--cyan);margin-bottom:0.75rem;">📐 Disparate Impact Analysis</h3>
+          <p class="text-muted text-sm line-height:1.7">
+            Measures whether different demographic groups receive significantly different positive outcomes. 
+            If a group's positive rate is less than 80% of the most-favored group, it triggers a flag.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal" style="animation-delay:0.1s">
+        <div class="purple-card" style="height:100%;">
+          <h3 style="font-size:1rem;font-weight:700;color:var(--purple-light);margin-bottom:0.75rem;">⚖️ Demographic Parity</h3>
+          <p class="text-muted text-sm">
+            Checks that the probability of a positive outcome is equal across all demographic groups, 
+            regardless of other features. A key metric in EU AI Act compliance.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal" style="animation-delay:0.2s">
+        <div class="purple-card" style="height:100%;">
+          <h3 style="font-size:1rem;font-weight:700;color:var(--pink);margin-bottom:0.75rem;">🔀 Proxy Variable Detection</h3>
+          <p class="text-muted text-sm">
+            Identifies columns that may act as proxies for sensitive attributes — e.g., zip code 
+            correlating with race, or job title correlating with gender.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- LAWS -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Legal Landscape</div>
+      <h2 class="section-title">Laws That <span class="gradient-text-pink">Regulate AI Bias</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+      <div class="lawyer-card reveal">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;">🇮🇳 DPDP Act 2023 (India)</h3>
+        <p class="text-muted text-sm">Digital Personal Data Protection Act mandates responsible AI processing. Violations can attract fines up to ₹250 Crore.</p>
+      </div>
+      <div class="lawyer-card reveal">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;">🇪🇺 EU AI Act</h3>
+        <p class="text-muted text-sm">World's first comprehensive AI regulation. High-risk AI systems (hiring, credit, healthcare) must undergo mandatory bias audits. Fines up to €30M or 6% of global revenue.</p>
+      </div>
+      <div class="lawyer-card reveal">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;">🇺🇸 ECOA & Fair Housing Act</h3>
+        <p class="text-muted text-sm">Equal Credit Opportunity Act prohibits discriminatory lending. Violations attract massive class-action lawsuits and regulatory fines.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM / FOOTER CTA -->
+<section class="section" style="padding-bottom:6rem;">
+  <div class="container">
+    <div class="glass-card reveal" style="text-align:center;max-width:700px;margin:0 auto;padding:3rem 2rem;">
+      <div style="font-size:3rem;margin-bottom:1rem;">💜</div>
+      <h2 style="font-size:1.8rem;font-weight:900;letter-spacing:-1px;margin-bottom:1rem;">
+        Built with Purpose
+      </h2>
+      <p class="text-muted" style="font-size:1rem;line-height:1.8;margin-bottom:2rem;">
+        FairLens is built by engineers who care deeply about AI ethics. 
+        We believe responsible AI starts with visibility — you can't fix what you can't see.
+      </p>
+      <a href="scan.html" class="btn btn-glow" style="font-size:1rem;padding:0.8rem 2rem;">
+        Start Scanning Your AI →
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="news-ticker" id="newsTicker">
+  <div class="ticker-label">⚡ LIVE</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

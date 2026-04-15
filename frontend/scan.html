@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FairLens Scanner — Upload & Analyze Your AI Dataset</title>
+  <meta name="description" content="Upload a CSV dataset and get instant AI bias detection across gender, age, location, race and income dimensions." />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="url(#g1)" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <ellipse cx="20" cy="20" rx="10" ry="6" stroke="url(#g1)" stroke-width="1.5"/>
+        <circle cx="20" cy="20" r="3.5" fill="url(#g1)"/>
+        <line x1="2" y1="20" x2="10" y2="20" stroke="url(#g2)" stroke-width="1.5"/>
+        <line x1="30" y1="20" x2="38" y2="20" stroke="url(#g2)" stroke-width="1.5"/>
+        <line x1="20" y1="2"  x2="20" y2="14" stroke="url(#g2)" stroke-width="1.5"/>
+        <line x1="20" y1="26" x2="20" y2="38" stroke="url(#g2)" stroke-width="1.5"/>
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#7C3AED"/><stop offset="1" stop-color="#06B6D4"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#06B6D4"/><stop offset="1" stop-color="#EC4899"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span>FairLens</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="scan.html" class="active">Scan</a></li>
+    <li><a href="reports.html">Reports</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a href="scan.html" class="btn btn-glow" style="padding:0.6rem 1.2rem;font-size:0.85rem;">Try Free Scan</a>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- SCAN OVERLAY (laser animation) -->
+<div class="scan-overlay" id="scanOverlay">
+  <div style="text-align:center;">
+    <p class="text-muted text-sm font-mono mb-2">FAIRLENS ENGINE v1.0</p>
+    <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:1.5rem;" class="gradient-text">Scanning Your Dataset...</h3>
+  </div>
+  <div class="scan-animation">
+    <div class="scan-grid"></div>
+    <div class="scan-line"></div>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.7rem;color:var(--purple-light);opacity:0.6;">YOUR DATASET</div>
+  </div>
+  <div class="scan-text font-mono" id="scanText">Initializing scan engine...</div>
+  <div class="scan-progress-bar">
+    <div class="scan-progress-fill" id="scanProgressFill"></div>
+  </div>
+  <p class="text-dim text-xs font-mono" id="scanPct">0%</p>
+</div>
+
+<!-- CONFETTI CONTAINER -->
+<div id="confetti-container"></div>
+
+<!-- ─── PAGE HEADER ─── -->
+<div class="page-header">
+  <div class="section-tag">Scanner</div>
+  <h1>Upload Your <span class="gradient-text">Dataset</span></h1>
+  <p>Drop any CSV file and get instant bias detection across 5 fairness dimensions.</p>
+</div>
+
+<!-- ─── UPLOAD SECTION ─── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="glass-card" style="max-width:700px;margin:0 auto;">
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept=".csv" style="display:none" />
+        <div class="upload-icon">📊</div>
+        <h3>Drop your dataset here or click to upload</h3>
+        <p>Supports CSV files up to 50MB</p>
+        <p class="supported">CSV · UTF-8 encoding · Headers required in first row</p>
+      </div>
+
+      <div class="file-preview" id="filePreview">
+        <div class="file-name">✅ <span id="fileName">file.csv</span></div>
+        <div class="text-sm text-muted" id="fileInfo">Loading...</div>
+      </div>
+
+      <div style="display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;">
+        <button class="btn btn-glow w-full" id="scanBtn" onclick="startScan()" disabled>
+          🔬 Analyze for Bias
+        </button>
+        <button class="btn btn-outline" onclick="loadDemoData()" style="font-size:0.85rem;">
+          Try Demo Dataset
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ RESULTS SECTION ═══════════════ -->
+<div id="results-section">
+
+  <!-- OVERALL SCORE -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Results</div>
+        <h2 class="section-title">Bias <span class="gradient-text">Scorecard</span></h2>
+        <p class="section-sub">Hover each card to flip it and see detailed analysis.</p>
+      </div>
+
+      <!-- Overall Big Circle -->
+      <div class="overall-score-wrapper">
+        <div style="text-align:center;">
+          <div class="overall-score">
+            <div class="overall-glow" id="overallGlow" style="background:radial-gradient(var(--purple),transparent);"></div>
+            <svg viewBox="0 0 180 180">
+              <circle class="track" cx="90" cy="90" r="80"/>
+              <circle class="fill" id="overallFill" cx="90" cy="90" r="80" stroke="url(#og)"/>
+              <defs>
+                <linearGradient id="og" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#7C3AED"/>
+                  <stop offset="100%" stop-color="#06B6D4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="score-text">
+              <span id="overallScore" style="color:var(--cyan)">--</span>
+              <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">/ 100</span>
+            </div>
+          </div>
+          <p style="font-size:1.1rem;font-weight:700;margin-top:0.75rem;">Overall Fairness Score</p>
+          <p class="text-muted text-sm" id="overallVerdict">Analyzing...</p>
+        </div>
+      </div>
+
+      <!-- Individual Score Cards -->
+      <div class="scores-grid" id="scoresGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Visualization</div>
+        <h2 class="section-title">Bias <span class="gradient-text">Breakdown</span></h2>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>📊 Fairness Score by Category</h3>
+          <canvas id="barChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>🕸️ Bias Radar Profile</h3>
+          <canvas id="radarChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>📈 Group Disparity — Gender</h3>
+          <canvas id="genderChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>📈 Group Disparity — Age</h3>
+          <canvas id="ageChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Bias Fingerprint -->
+      <div class="chart-card mt-4" style="text-align:center;">
+        <h3 style="justify-content:center;">🧬 Bias Fingerprint — Unique Dataset Signature</h3>
+        <p class="text-muted text-sm mb-2">A mandala pattern unique to this dataset's bias profile</p>
+        <canvas id="fingerprint-canvas" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- GEMINI EXPLAIN -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="glass-card reveal"
+           style="max-width:750px;margin:0 auto;text-align:center;">
+
+        <div style="font-size:2rem;margin-bottom:0.5rem;">🤖</div>
+        <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:0.5rem;">
+          Ask Gemini AI to Explain
+        </h3>
+        <p class="text-muted text-sm mb-3">
+          Get a plain English explanation of your bias results powered by Google Gemini
+        </p>
+
+        <button
+          class="btn btn-glow"
+          id="geminiBtn"
+          onclick="getGeminiExplanation()"
+          style="background:linear-gradient(135deg,#4285F4,#0F9D58);margin-bottom:1.5rem;">
+          🤖 Explain with Google Gemini
+        </button>
+
+        <div id="geminiBox"
+             style="display:none;text-align:left;background:rgba(66,133,244,0.08);
+                    border:1px solid rgba(66,133,244,0.3);border-radius:12px;padding:1.5rem;">
+
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+            <span style="font-size:1rem;">🤖</span>
+            <span style="font-size:0.7rem;font-family:var(--mono);color:#4285F4;letter-spacing:1px;">
+              POWERED BY GOOGLE GEMINI AI
+            </span>
+          </div>
+
+          <p id="geminiText"
+             style="color:var(--text-muted);line-height:1.9;font-size:0.95rem;">
+          </p>
+
+          <p style="font-size:0.7rem;color:var(--text-dim);margin-top:1rem;font-style:italic;">
+            AI generated explanation. Not legal advice.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SHADOW MODE -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="purple-card">
+        <div class="section-tag" style="margin-bottom:1rem;">Shadow Mode</div>
+        <h2 class="section-title mb-2">What If You Were <span class="gradient-text">Different?</span></h2>
+        <p class="text-muted text-sm mb-3">Enter a demographic profile and see how bias would affect your outcome.</p>
+
+        <div class="shadow-form">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="shadow-name" placeholder="e.g. Arjun Sharma" />
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="shadow-gender">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="non-binary">Non-binary</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="shadow-age" placeholder="28" min="18" max="80" />
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <select id="shadow-location">
+              <option>Mumbai</option>
+              <option>Delhi</option>
+              <option>Rural Maharashtra</option>
+              <option>Bengaluru</option>
+              <option>Northeast India</option>
+              <option>Tier 3 City</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Income Level</label>
+            <select id="shadow-income">
+              <option value="low">Low (Under ₹3L/yr)</option>
+              <option value="mid" selected>Mid (₹3-10L/yr)</option>
+              <option value="high">High (₹10L+/yr)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Education</label>
+            <select id="shadow-education">
+              <option>High School</option>
+              <option>Bachelor's</option>
+              <option>Master's</option>
+              <option>PhD</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-glow" onclick="runShadowAnalysis()">👤 Run Shadow Analysis</button>
+
+        <div class="shadow-result mt-4" id="shadowResult">
+          <div class="silhouette-wrapper">
+            <svg class="silhouette" id="silhouetteSvg" viewBox="0 0 100 180" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="30" r="22"/>
+              <path d="M10 170 Q10 100 50 95 Q90 100 90 170Z"/>
+              <line x1="50" y1="95" x2="20" y2="135" stroke-width="8" stroke-linecap="round"/>
+              <line x1="50" y1="95" x2="80" y2="135" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="shadow-comparison">
+            <div class="comparison-box" id="origBox" style="border-color:rgba(6,182,212,0.4)">
+              <div class="label">Your Profile</div>
+              <div class="big-number" id="origScore" style="color:var(--cyan)">—</div>
+              <div class="label">Success Probability</div>
+            </div>
+            <div class="comparison-box" id="altBox" style="border-color:rgba(236,72,153,0.4)">
+              <div class="label">Different Demographic</div>
+              <div class="big-number" id="altScore" style="color:var(--pink)">—</div>
+              <div class="label">Success Probability</div>
+            </div>
+          </div>
+        </div>
+        <p class="text-muted text-sm mt-2" id="shadowMessage" style="display:none;"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI LAWYER -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="lawyer-card" id="lawyerPanel">
+        <div class="lawyer-header">
+          <div style="font-size:2rem;">⚖️</div>
+          <div>
+            <h2 style="font-size:1.3rem;font-weight:800;">AI Lawyer Panel</h2>
+            <p class="text-muted text-sm">Estimated legal exposure based on detected bias</p>
+          </div>
+          <div class="lawyer-badge" id="riskBadge">ANALYZING...</div>
+        </div>
+
+        <div class="fine-display" id="fineDisplay">₹ —</div>
+        <p class="text-muted text-sm" id="legalDesc">Calculating risk...</p>
+
+        <ul class="lawyer-laws" id="legalLaws"></ul>
+
+        <p class="not-legal">⚠️ This is not legal advice. FairLens provides educational risk estimates only. Consult a qualified legal professional for actual compliance guidance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIX MY AI -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Fix My AI</div>
+        <h2 class="section-title">Watch the <span class="gradient-text">Bias Disappear</span></h2>
+        <p class="section-sub">Apply fairness corrections and watch scores improve in real time.</p>
+      </div>
+
+      <div class="fix-split">
+        <div class="fix-panel biased">
+          <div class="section-tag" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.4);color:var(--red);">Before Fix</div>
+          <div style="margin:1rem 0;">
+            <canvas id="fixBeforeChart" height="180"></canvas>
+          </div>
+          <div style="text-align:center;font-family:var(--mono);">
+            Bias Score: <span id="fixBeforeScore" style="color:var(--red);font-size:1.3rem;font-weight:900;">--</span>
+          </div>
+        </div>
+
+        <div class="fix-middle">
+          <button class="fix-btn" id="fixBtn" onclick="applyFix()" data-tooltip="Apply fairness reweighting algorithm">
+            🔧
+          </button>
+          <span class="font-mono text-xs text-muted">FIX IT</span>
+        </div>
+
+        <div class="fix-panel fixed">
+          <div class="section-tag" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.4);color:var(--green);">After Fix</div>
+          <div style="margin:1rem 0;">
+            <canvas id="fixAfterChart" height="180"></canvas>
+          </div>
+          <div style="text-align:center;font-family:var(--mono);">
+            Bias Score: <span id="fixAfterScore" style="color:var(--green);font-size:1.3rem;font-weight:900;">--</span>
+          </div>
+
+          <!-- ✅ FIXED DATASET DOWNLOAD CARD -->
+          <div class="fix-download-section" id="fixDownloadSection">
+            <div class="fixed-dataset-card">
+              <div class="fixed-dataset-header">✅ FIXED DATASET READY</div>
+              <div class="fixed-stats" id="fixedStats">
+                <!-- populated by JS after applyFix() -->
+              </div>
+              <button class="btn-download-fixed" onclick="downloadFixedDataset()">
+                ⬇&#xFE0F;&nbsp; Download Fixed Dataset
+              </button>
+              <p class="fix-disclaimer">
+                Fixed dataset uses statistical reweighing. Manual review
+                recommended before production use.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BIAS BATTLE MODE -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Bias Battle Mode</div>
+        <h2 class="section-title">Dataset <span class="gradient-text-pink">Battle Arena</span></h2>
+        <p class="section-sub">Upload two datasets. See which AI is more biased. Only one winner.</p>
+      </div>
+
+      <div class="battle-arena">
+        <div class="battle-team blue">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">🔵</div>
+          <h3 style="font-weight:800;color:#3B82F6;margin-bottom:1rem;">Dataset A</h3>
+          <div class="upload-zone" style="padding:2rem 1rem;border-color:rgba(59,130,246,0.5);" onclick="document.getElementById('battleFileA').click()">
+            <input type="file" id="battleFileA" accept=".csv" style="display:none" onchange="setBattleFile('A',this)" />
+            <p>Click to Upload</p>
+            <p class="text-xs text-dim mt-1">CSV only</p>
+          </div>
+          <div style="margin-top:1rem;font-family:var(--mono);">
+            Score: <span id="battleScoreA" style="color:#3B82F6;font-size:1.5rem;font-weight:900;">?</span>
+          </div>
+        </div>
+
+        <div class="battle-vs">
+          <div class="vs-text">VS</div>
+          <button class="btn btn-primary" onclick="startBattle()" id="battleBtn" disabled>⚔️ Fight!</button>
+          <div class="winner-display" id="winnerDisplay">
+            <div class="trophy">🏆</div>
+            <h3 style="font-size:1.5rem;font-weight:900;" id="winnerText">Winner!</h3>
+            <p class="text-muted text-sm mt-1" id="winnerDesc"></p>
+          </div>
+        </div>
+
+        <div class="battle-team red">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">🔴</div>
+          <h3 style="font-weight:800;color:var(--red);margin-bottom:1rem;">Dataset B</h3>
+          <div class="upload-zone" style="padding:2rem 1rem;border-color:rgba(239,68,68,0.5);" onclick="document.getElementById('battleFileB').click()">
+            <input type="file" id="battleFileB" accept=".csv" style="display:none" onchange="setBattleFile('B',this)" />
+            <p>Click to Upload</p>
+            <p class="text-xs text-dim mt-1">CSV only</p>
+          </div>
+          <div style="margin-top:1rem;font-family:var(--mono);">
+            Score: <span id="battleScoreB" style="color:var(--red);font-size:1.5rem;font-weight:900;">?</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOMMENDATIONS -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Recommendations</div>
+        <h2 class="section-title">How to <span class="gradient-text">Fix Your AI</span></h2>
+      </div>
+      <div class="rec-list" id="recList"></div>
+    </div>
+  </section>
+
+  <!-- REPORT DOWNLOAD -->
+  <section class="section" style="padding-top:0;padding-bottom:6rem;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Report</div>
+        <h2 class="section-title">Download <span class="gradient-text">Full Report</span></h2>
+      </div>
+
+      <div class="report-preview" style="max-width:600px;margin:0 auto;" id="reportPreview">
+        <div class="report-header">
+          <div class="report-logo">🔍 FairLens Report</div>
+          <div class="report-meta" id="reportMeta">Generated: —</div>
+        </div>
+
+        <div class="report-row">
+          <span class="r-label">Dataset</span>
+          <span class="r-value font-mono" id="rptFile">—</span>
+        </div>
+        <div class="report-row">
+          <span class="r-label">Overall Score</span>
+          <span class="r-value" id="rptScore">—</span>
+        </div>
+        <div class="report-row">
+          <span class="r-label">Risk Level</span>
+          <span class="r-value" id="rptRisk">—</span>
+        </div>
+        <div class="report-row">
+          <span class="r-label">Estimated Fine</span>
+          <span class="r-value text-red" id="rptFine">—</span>
+        </div>
+        <div class="report-row">
+          <span class="r-label">Rows Analyzed</span>
+          <span class="r-value" id="rptRows">—</span>
+        </div>
+
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <button class="btn btn-glow" onclick="downloadReport()">⬇ Download Report</button>
+          <button class="btn btn-outline" onclick="copyReport()">📋 Copy Summary</button>
+        </div>
+
+        <div class="dl-progress" id="dlProgress">
+          <p class="text-muted text-xs font-mono">Generating report...</p>
+          <div class="dl-bar"><div class="dl-fill" id="dlFill"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /results-section -->
+
+<!-- NEWS TICKER -->
+<div class="news-ticker" id="newsTicker">
+  <div class="ticker-label">⚡ LIVE</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
