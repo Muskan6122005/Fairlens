@@ -17,7 +17,8 @@ from bias_detector import (
 import google.generativeai as genai
 import pandas as pd
 
-app = Flask(__name__)
+frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend'))
+app = Flask(__name__, static_folder=frontend_dir, static_url_path='/')
 CORS(app, origins=[
   'http://localhost:5500',
   'http://127.0.0.1:5500',
@@ -274,6 +275,20 @@ Rules:
         'model': 'rule-based',
         'success': True
     })
+
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_static(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    if not path.startswith('api/'):
+        return send_from_directory(app.static_folder, 'index.html')
+    return jsonify({'error': 'Not found'}), 404
 
 
 print(f"Gemini Status: " + ("✅ Connected" if gemini_model else "⚠️ Not configured"))
